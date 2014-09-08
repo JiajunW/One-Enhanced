@@ -4,45 +4,47 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @include     http://wufazhuce.com/one/vol*
 // @version     1.0.0
-// @grant       GM_getResourceText
 // @grant       GM_addStyle
+// @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
-var custom_css = "\
-  #enhanced-navbar > a {\
-    position: fixed;\
-    display: block;\
-    background-color: #01AEF0;\
-    width: 64px;\
-    height: 64px;\
-    line-height: 64px;\
-    text-align: center;\
-  }\
-\
-  #enhanced-newer {\
-    top: 50%;\
-    left: 0;\
-    margin-top: -32px;\
-    border-top-right-radius: 42px;\
-    border-bottom-right-radius: 42px;\
-  }\
-\
-  #enhanced-older {\
-    top: 50%;\
-    right: 0;\
-    margin-top: -32px;\
-    border-top-left-radius: 42px;\
-    border-bottom-left-radius: 42px;\
-  }\
-\
-  #enhanced-navbar span {\
-    color: white;\
-    line-height: inherit;\
-    font-size: 40px;\
-    top: 2px;\
-  }\
-";
-GM_addStyle(custom_css);
+function add_style() {
+    var custom_css = "\
+      #enhanced-navbar > a {\
+        position: fixed;\
+        display: block;\
+        background-color: #01AEF0;\
+        width: 64px;\
+        height: 64px;\
+        line-height: 64px;\
+        text-align: center;\
+      }\
+    \
+      #enhanced-newer {\
+        top: 50%;\
+        left: 0;\
+        margin-top: -32px;\
+        border-top-right-radius: 42px;\
+        border-bottom-right-radius: 42px;\
+      }\
+    \
+      #enhanced-older {\
+        top: 50%;\
+        right: 0;\
+        margin-top: -32px;\
+        border-top-left-radius: 42px;\
+        border-bottom-left-radius: 42px;\
+      }\
+    \
+      #enhanced-navbar span {\
+        color: white;\
+        line-height: inherit;\
+        font-size: 40px;\
+        top: 2px;\
+      }\
+    ";
+    GM_addStyle(custom_css);
+}
 
 function get_today_no() {
     var the_day_before_first = new Date(2012, 10 - 1, 7);
@@ -84,7 +86,7 @@ function add_nav() {
     document.body.appendChild(new_nav);
 
     var url = '/one/vol.'
-    if (cur !== newest) {
+    if (cur < newest) {
         var url_next = url + (cur + 1);
         var new_nav_newer = dom(
             'a',
@@ -94,7 +96,7 @@ function add_nav() {
         new_nav.appendChild(new_nav_newer);
     }
 
-    if (cur !== oldest) {
+    if (cur > oldest) {
         var url_prev = url + (cur - 1);
         var new_nav_older = dom(
             'a',
@@ -103,6 +105,40 @@ function add_nav() {
         );
         new_nav.appendChild(new_nav_older);
     }
+
+    if (cur === newest) {
+        /*
+         * tomorrow's post can be published at today's anytime
+         * so we must look up whether tomorrow's post is published or not
+         * note: only do the look up if we are viewing today's post
+         */
+        var tomorrow_no = newest + 1;
+
+        var tomorrow_url = '/one/vol.' + tomorrow_no;
+        GM_xmlhttpRequest({
+            url: tomorrow_url,
+            method: "HEAD",
+            onload: function(response) {
+                if (response.status == 200) {
+                    // has already published
+                    // add the nav bar
+                    var new_nav_newer = dom(
+                        'a',
+                        { id : 'enhanced-newer', href : tomorrow_url },
+                        '<span class="glyphicon glyphicon-circle-arrow-left"></span>'
+                    );
+                    new_nav.appendChild(new_nav_newer);
+                }
+            }
+        });
+    }
+
+    add_style();
 }
 
-add_nav();
+var header = document.querySelector('.page-header > h1');
+if (header && header.innerHTML.trim() === '404 Not Found') {
+    // this is a 404 page
+} else {
+    add_nav();
+}
