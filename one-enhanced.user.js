@@ -2,6 +2,7 @@
 // @name        「ONE·一个」网站增强
 // @namespace   https://github.com/jiajunw/one-enhanced
 // @description 为「ONE·一个」网站增加方便的功能
+// @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
 // @version     1.0.0
 // @grant       GM_addStyle
