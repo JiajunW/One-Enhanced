@@ -5,46 +5,14 @@
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
 // @version     1.0.0
+// @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
+// @grant       GM_getResourceText
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
 function add_style() {
-    var custom_css = "\
-      #enhanced-navbar > a {\
-        position: fixed;\
-        display: block;\
-        background-color: #01AEF0;\
-        width: 64px;\
-        height: 64px;\
-        line-height: 64px;\
-        text-align: center;\
-      }\
-    \
-      #enhanced-newer {\
-        top: 50%;\
-        left: 0;\
-        margin-top: -32px;\
-        border-top-right-radius: 42px;\
-        border-bottom-right-radius: 42px;\
-      }\
-    \
-      #enhanced-older {\
-        top: 50%;\
-        right: 0;\
-        margin-top: -32px;\
-        border-top-left-radius: 42px;\
-        border-bottom-left-radius: 42px;\
-      }\
-    \
-      #enhanced-navbar span {\
-        color: white;\
-        line-height: inherit;\
-        font-size: 40px;\
-        top: 2px;\
-      }\
-    ";
-    GM_addStyle(custom_css);
+    GM_addStyle(GM_getResourceText("custom_css"));
 }
 
 function get_today_no() {
