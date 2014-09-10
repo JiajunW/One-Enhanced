@@ -4,7 +4,7 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
-// @version     1.0.1
+// @version     1.1.0
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
@@ -47,10 +47,6 @@ function dom(tag, attr, inner) {
 }
 
 function add_nav() {
-    var newest = get_today_no(),
-        oldest = 1,
-        cur = get_cur_no();
-
     var new_nav = dom('nav', { id : 'enhanced-navbar' });
     document.body.appendChild(new_nav);
 
@@ -75,39 +71,54 @@ function add_nav() {
         new_nav.appendChild(new_nav_older);
     }
 
-    if (cur === newest) {
-        /*
-         * tomorrow's post can be published at today's anytime
-         * so we must look up whether tomorrow's post is published or not
-         * note: only do the look up if we are viewing today's post
-         */
-        var tomorrow_no = newest + 1;
-
-        var tomorrow_url = '/one/vol.' + tomorrow_no;
-        GM_xmlhttpRequest({
-            url: tomorrow_url,
-            method: "HEAD",
-            onload: function(response) {
-                if (response.status == 200) {
-                    // has already published
-                    // add the nav bar
-                    var new_nav_newer = dom(
-                        'a',
-                        { id : 'enhanced-newer', href : tomorrow_url },
-                        '<span class="glyphicon glyphicon-circle-arrow-left"></span>'
-                    );
-                    new_nav.appendChild(new_nav_newer);
-                }
-            }
-        });
-    }
-
     add_style();
 }
 
-var header = document.querySelector('.page-header > h1');
-if (header && header.innerHTML.trim() === '404 Not Found') {
-    // this is a 404 page
-} else {
-    add_nav();
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive)
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+function add_random_link() {
+    var rand = getRandomInt(oldest, newest);
+    var rand_url = '/one/vol.' + rand;
+
+    var navbar = document.querySelector('#one-navbar .navbar-right');
+    var recent = document.querySelector('#one-navbar .navbar-right > li');
+    var rand_link = '<a href="' + rand_url + '"><span class="visible-xs">ONE<br />偶遇</span><span class="hidden-xs">ONE 偶遇</span></a>';
+    var rand_item = dom('li', null, rand_link);
+    navbar.insertBefore(rand_item, recent);
+}
+
+function main() {
+    var header = document.querySelector('.page-header > h1');
+    if (header && header.innerHTML.trim() === '404 Not Found') {
+        // this is a 404 page
+    } else {
+        add_nav();
+        add_random_link();
+    }
+}
+
+var newest = get_today_no(),
+    oldest = 1,
+    cur    = get_cur_no();
+var tomorrow_url = '/one/vol.' + (newest + 1);
+
+GM_xmlhttpRequest({
+    url: tomorrow_url,
+    method: "HEAD",
+    onload: function(response) {
+        if (response.status == 200) {
+            // has already published
+            // add the nav bar
+            newest += 1;
+            main();
+        } else if (response.status == 404) {
+            // not published yet.
+        }
+    }
+});
