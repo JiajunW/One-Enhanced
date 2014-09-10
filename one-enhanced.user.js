@@ -4,7 +4,7 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
-// @version     1.0.0
+// @version     1.0.1
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
