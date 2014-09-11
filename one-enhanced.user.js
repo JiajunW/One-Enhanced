@@ -4,7 +4,7 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
-// @version     1.1.0
+// @version     1.1.1
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
@@ -114,11 +114,11 @@ GM_xmlhttpRequest({
     onload: function(response) {
         if (response.status == 200) {
             // has already published
-            // add the nav bar
+            // so plus 1 to newest
             newest += 1;
-            main();
         } else if (response.status == 404) {
             // not published yet.
         }
+        main();
     }
 });
