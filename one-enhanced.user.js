@@ -4,7 +4,7 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
-// @version     1.1.1
+// @version     1.2.0
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
@@ -50,7 +50,7 @@ function add_nav() {
     var new_nav = dom('nav', { id : 'enhanced-navbar' });
     document.body.appendChild(new_nav);
 
-    var url = '/one/vol.'
+    var url = '/one/vol.';
     if (cur < newest) {
         var url_next = url + (cur + 1);
         var new_nav_newer = dom(
@@ -69,6 +69,26 @@ function add_nav() {
             '<span class="glyphicon glyphicon-circle-arrow-right"></span>'
         );
         new_nav.appendChild(new_nav_older);
+    }
+
+    var doSomething = function(e) {
+        e.preventDefault();
+
+        var tag = e.target.tagName.toLowerCase();
+        var url;
+        var hash = document.location.hash;
+        if (tag == 'span') {
+            url = e.target.parentNode.href;
+        } else {
+            url = e.target.href;
+        }
+
+        document.location.href = url + hash;
+    };
+
+    var nodes = document.querySelectorAll('#enhanced-navbar a');
+    for (var i = 0; i < nodes.length; ++i) {
+        nodes[i].addEventListener('click', doSomething, false);
     }
 
     add_style();
