@@ -4,7 +4,7 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
-// @version     1.2.0
+// @version     1.2.1
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
@@ -46,6 +46,21 @@ function dom(tag, attr, inner) {
     return tag;
 }
 
+function jump_to_page_tab(e) {
+    e.preventDefault();
+
+    var tag = e.target.tagName.toLowerCase();
+    var url;
+    var hash = document.location.hash;
+    if (tag == 'span') {
+        url = e.target.parentNode.href;
+    } else {
+        url = e.target.href;
+    }
+
+    document.location.href = url + hash;
+}
+
 function add_nav() {
     var new_nav = dom('nav', { id : 'enhanced-navbar' });
     document.body.appendChild(new_nav);
@@ -71,24 +86,10 @@ function add_nav() {
         new_nav.appendChild(new_nav_older);
     }
 
-    var doSomething = function(e) {
-        e.preventDefault();
-
-        var tag = e.target.tagName.toLowerCase();
-        var url;
-        var hash = document.location.hash;
-        if (tag == 'span') {
-            url = e.target.parentNode.href;
-        } else {
-            url = e.target.href;
-        }
-
-        document.location.href = url + hash;
-    };
 
     var nodes = document.querySelectorAll('#enhanced-navbar a');
     for (var i = 0; i < nodes.length; ++i) {
-        nodes[i].addEventListener('click', doSomething, false);
+        nodes[i].addEventListener('click', jump_to_page_tab, false);
     }
 
     add_style();
@@ -111,6 +112,8 @@ function add_random_link() {
     var rand_link = '<a href="' + rand_url + '"><span class="visible-xs">ONE<br />偶遇</span><span class="hidden-xs">ONE 偶遇</span></a>';
     var rand_item = dom('li', null, rand_link);
     navbar.insertBefore(rand_item, recent);
+
+    rand_item.childNodes[0].addEventListener('click', jump_to_page_tab, false);
 }
 
 function main() {
