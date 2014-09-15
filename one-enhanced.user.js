@@ -4,7 +4,7 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one/vol*
-// @version     1.2.1
+// @version     1.3.0
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
@@ -116,6 +116,16 @@ function add_random_link() {
     rand_item.childNodes[0].addEventListener('click', jump_to_page_tab, false);
 }
 
+/**
+ * Some questions (e.g. vol 1,3,4,210, etc.) have html code on pages
+ * which are ugly. So I decide to remove them.
+ */
+function strip_html() {
+    var question = document.querySelector('.cuestion-contenido').innerHTML;
+    var stripped = question.replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/<(?:.|\n)*?>/gm, '');
+    document.querySelector('.cuestion-contenido').innerHTML = stripped;
+}
+
 function main() {
     var header = document.querySelector('.page-header > h1');
     if (header && header.innerHTML.trim() === '404 Not Found') {
@@ -123,6 +133,7 @@ function main() {
     } else {
         add_nav();
         add_random_link();
+        strip_html();
     }
 }
 
