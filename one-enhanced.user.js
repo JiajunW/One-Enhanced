@@ -139,6 +139,7 @@ function detail_page() {
 }
 
 function list_page() {
+    add_style();
     var row = dom('div', { class : 'row' }, '<hr />'),
         btn = dom('button', { id : 'loadmore', class : 'btn btn-primary center-block' }, '载入更多');
     row.appendChild(btn);
@@ -216,6 +217,16 @@ function list_page() {
             }); // xhr
         } // for loop
     }, false); // addEventListener
+
+    window.addEventListener("scroll", function(evt) {
+        var btn = document.querySelector('#loadmore');
+        var page_height = window.innerHeight,
+            btn_to_top = btn.getBoundingClientRect().top;
+
+        if (btn_to_top - page_height < 50) {
+            btn.click();
+        }
+    });
 }
 
 var path = document.location.pathname;
