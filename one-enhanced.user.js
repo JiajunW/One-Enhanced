@@ -3,6 +3,7 @@
 // @namespace   https://github.com/jiajunw/one-enhanced
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
+// @include     http://wufazhuce.com/one
 // @include     http://wufazhuce.com/one/vol*
 // @version     1.3.0
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
@@ -126,7 +127,7 @@ function strip_html() {
     document.querySelector('.cuestion-contenido').innerHTML = stripped;
 }
 
-function main() {
+function detail_page() {
     var header = document.querySelector('.page-header > h1');
     if (header && header.innerHTML.trim() === '404 Not Found') {
         // this is a 404 page
@@ -137,22 +138,108 @@ function main() {
     }
 }
 
-var newest = get_today_no(),
-    oldest = 1,
-    cur    = get_cur_no();
-var tomorrow_url = '/one/vol.' + (newest + 1);
+function list_page() {
+    var row = dom('div', { class : 'row' }, '<hr />'),
+        btn = dom('button', { id : 'loadmore', class : 'btn btn-primary center-block' }, '载入更多');
+    row.appendChild(btn);
+    document.querySelector('.one-indice > .col-lg-8').appendChild(row);
 
-GM_xmlhttpRequest({
-    url: tomorrow_url,
-    method: "HEAD",
-    onload: function(response) {
-        if (response.status == 200) {
-            // has already published
-            // so plus 1 to newest
-            newest += 1;
-        } else if (response.status == 404) {
-            // not published yet.
+    btn.addEventListener('click', function(e) {
+        // first disable the button
+        var btn = document.querySelector('#loadmore');
+        btn.setAttribute("disabled", "true");
+        btn.innerHTML = '<span class="glyphicon glyphicon-refresh"></span> 拼命加载中...';
+
+        // we should load 9 more items every click
+        var pic_urls = {};
+
+        var items = document.querySelectorAll('.pasado');
+        var last_item = items[items.length - 1];
+        var last_link = last_item.children[1].href;
+        var matches = /\/one\/vol\.(\d+)$/.exec(last_link);
+        var last_no = parseInt(matches[1]);
+
+        for (var i = last_no - 1; i > last_no - 10; --i) {
+            var url = '/one/vol.' + i;
+            GM_xmlhttpRequest({
+                url: url,
+                method: "GET",
+                onload: function(response) {
+                    if (response.status == 200) {
+                        var re = /\/one\/vol\.(\d+)/g;
+                        var matches = re.exec(response.finalUrl);
+                        var vol = parseInt(matches[1]);
+
+                        var tmp = dom('div');
+                        tmp.innerHTML = response.responseText;
+                        var pic = tmp.querySelector('.one-imagen').children[0].src;
+
+                        var date = tmp.querySelector('.one-pubdate');
+                        var day = date.children[0].innerHTML,
+                            month = date.children[1].innerHTML.split(' ')[0],
+                            year = date.children[1].innerHTML.split(' ')[1];
+                        var date_str = month + ' ' + day + ', ' + year;
+
+                        pic_urls[vol] = { pic: pic, date: date_str }
+                    }
+
+                    var count = 0;
+                    var i;
+                    for (i in pic_urls) {
+                        if (pic_urls.hasOwnProperty(i)) {
+                            count++;
+                        }
+                    }
+                    if (count == 9){
+                        // finish loading!
+                        for (i = last_no - 1; i > last_no - 10; --i) {
+                            var new_url = '/one/vol.' + i;
+                            var block = dom('div', { class : 'col-sm-4 pasado' }, '<hr />');
+                            var img_link = dom('a', { href: new_url });
+                            var img = dom('img', { class : 'one-imagen', src : pic_urls[i].pic });
+                            var p = dom('p');
+                            var p_link = dom('a', { href: new_url }, '<span class="pull-right">' + pic_urls[i].date + '</span>VOL.' + i + '</a>');
+                            p.appendChild(p_link);
+                            img_link.appendChild(img);
+                            block.appendChild(img_link);
+                            block.appendChild(p);
+
+                            var posts_row = document.querySelector('.one-indice .row');
+                            posts_row.appendChild(block);
+                        }
+
+                        // enable the button again.
+                        btn.removeAttribute("disabled");
+                        btn.innerHTML = '加载更多';
+                    }
+                } // onload
+            }); // xhr
+        } // for loop
+    }, false); // addEventListener
+}
+
+var path = document.location.pathname;
+
+if (/^\/one$/.test(path)) {
+    list_page();
+} else if (/^\/one\/vol\.(\d+)$/.test(path)) {
+    var newest = get_today_no(),
+        oldest = 1,
+        cur    = get_cur_no();
+    var tomorrow_url = '/one/vol.' + (newest + 1);
+
+    GM_xmlhttpRequest({
+        url: tomorrow_url,
+        method: "HEAD",
+        onload: function(response) {
+            if (response.status == 200) {
+                // has already published
+                // so plus 1 to newest
+                newest += 1;
+            } else if (response.status == 404) {
+                // not published yet.
+            }
+            detail_page();
         }
-        main();
-    }
-});
+    });
+}
