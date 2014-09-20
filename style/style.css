@@ -30,3 +30,29 @@
   font-size: 40px;
   top: 2px;
 }
+
+/* fix height difference in index view */
+.pasado > a {
+  display: block;
+}
+
+/* sm */
+@media (min-width:768px) and (max-width:991px){
+  .pasado > a {
+    min-height: 155px;
+  }
+}
+
+/* md */
+@media (min-width:992px) and (max-width:1199px){
+  .pasado > a {
+    min-height: 201px;
+  }
+}
+
+/* lg */
+@media (min-width:1200px){
+  .pasado > a {
+    min-height: 195px;
+  }
+}
