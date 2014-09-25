@@ -6,7 +6,7 @@
 // @include     http://wufazhuce.com/one
 // @include     http://wufazhuce.com/one/
 // @include     http://wufazhuce.com/one/vol*
-// @version     1.4.0
+// @version     1.5.0
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
@@ -128,6 +128,19 @@ function strip_html() {
     document.querySelector('.cuestion-contenido').innerHTML = stripped;
 }
 
+/**
+ * Some old pages does not contain one things!
+ * So we can remove the link
+ */
+function strip_things() {
+    var thing_title = document.querySelector('#tab-cosas .cosas-titulo').innerHTML.trim();
+    if (!thing_title) {
+        var navbar = document.querySelector('#one-navbar ul');
+        var link = navbar.querySelector('li:last-child');
+        navbar.removeChild(link);
+    }
+}
+
 function detail_page() {
     var header = document.querySelector('.page-header > h1');
     if (header && header.innerHTML.trim() === '404 Not Found') {
@@ -136,6 +149,7 @@ function detail_page() {
         add_nav();
         add_random_link();
         strip_html();
+        strip_things();
     }
 }
 
