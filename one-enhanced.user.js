@@ -4,6 +4,7 @@
 // @description 为「ONE·一个」网站增加方便的功能
 // @icon        https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/res/icon.png
 // @include     http://wufazhuce.com/one
+// @include     http://wufazhuce.com/one/
 // @include     http://wufazhuce.com/one/vol*
 // @version     1.4.0
 // @resource    custom_css https://raw.githubusercontent.com/JiajunW/One-Enhanced/master/style/style.css
@@ -231,7 +232,7 @@ function list_page() {
 
 var path = document.location.pathname;
 
-if (/^\/one$/.test(path)) {
+if (/^\/one\/?$/.test(path)) {
     list_page();
 } else if (/^\/one\/vol\.(\d+)$/.test(path)) {
     var newest = get_today_no(),
